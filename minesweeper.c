@@ -5,7 +5,7 @@
 // These macros assure a simpler way of compiling on either Windows or Linux machines
 #ifdef _WIN32
     #define NEWLINE "\r\n"
-    #define CHARNEWLINE '\r\n'
+    #define CHARNEWLINE '\n'
 #else
     #define NEWLINE "\n"
     #define CHARNEWLINE '\n'
@@ -94,25 +94,25 @@ int **generate_boolean(int n)
 
 void place_bombs(char **map, int n, bombs diff)
 {
-    int bombs;
+    int bombs_count;
 
     srand(time(NULL));
     switch(n) {
         case 8: {
-            bombs = diff.easy;
+            bombs_count = diff.easy;
             break;
         }
         case 16: {
-            bombs = diff.medium;
+            bombs_count = diff.medium;
             break;
         }
         case 24: {
-            bombs = diff.hard;
+            bombs_count = diff.hard;
             break;
         }
     }
-    while (bombs) {
-        int x = rand() % n + 1, y = rand() % n + 1;
+    while (bombs_count) {
+        int x = rand() % (n - 2) + 1, y = rand() % (n - 2) + 1;
 
         if (map[x][y] != 'b') {
             map[x][y] = 'b';
@@ -123,7 +123,7 @@ void place_bombs(char **map, int n, bombs diff)
                     }
                 }
             }
-            bombs--;
+            bombs_count--;
         }
     }
     for (int i = 0; i < n + 2; i++) {
@@ -226,7 +226,7 @@ void fill(char **map, int **fog, int x, int y, int n, int *count)
 
 void gameplay(int n, char **map, bombs diff)
 {
-    int x = 1, y = 1, loop = 1, bombs, count = 0;
+    int x = 1, y = 1, loop = 1, bombs_count, count = 0;
     int **fog = generate_boolean(n);
 
     if (!fog) {
@@ -235,15 +235,15 @@ void gameplay(int n, char **map, bombs diff)
     }
     switch(n) {
         case 10: {
-            bombs = diff.easy;
+            bombs_count = diff.easy;
             break;
         }
         case 18: {
-            bombs = diff.medium;
+            bombs_count = diff.medium;
             break;
         }
         case 26: {
-            bombs = diff.hard;
+            bombs_count = diff.hard;
             break;
         }
     }
@@ -271,7 +271,7 @@ void gameplay(int n, char **map, bombs diff)
             fill(map, fog, x, y, n - 2, &count);
         }
         refresh_screen();
-        if (count == (n - 2) * (n - 2) - bombs) {
+        if (count == (n - 2) * (n - 2) - bombs_count) {
             display_full(n, map);
             printf("You won!"NEWLINE);
             loop = 0;
