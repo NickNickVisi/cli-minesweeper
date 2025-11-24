@@ -3,12 +3,13 @@
 #include <time.h>
 
 // These macros assure a simpler way of compiling on either Windows or Linux machines
+
+#define CHARNEWLINE '\n'
+
 #ifdef _WIN32
     #define NEWLINE "\r\n"
-    #define CHARNEWLINE '\n'
 #else
     #define NEWLINE "\n"
-    #define CHARNEWLINE '\n'
 #endif
 
 typedef struct {
@@ -36,11 +37,18 @@ void clear_buffer(void)
 int main_menu(void)
 {
     int selection;
+    char newline = '\0';
 
     a:
     printf("Please select difficulty or action:"NEWLINE);
     printf("1 - Easy"NEWLINE"2 - Medium"NEWLINE"3 - Hard"NEWLINE"4 - Quit"NEWLINE);
-    scanf(" %d", &selection);
+    scanf(" %d%c", &selection, &newline);
+    if (newline != CHARNEWLINE) {
+        refresh_screen();
+        clear_buffer();
+        printf("Insert only a digit!"NEWLINE);
+        goto a;
+    }
     switch(selection) {
         case 1: {
         }
@@ -54,10 +62,9 @@ int main_menu(void)
         }
         default: {
             refresh_screen();
-            printf("Please use a valid character."NEWLINE);
-            clear_buffer();
+            printf("Please use a valid digit."NEWLINE);
+            newline = '\0';
             goto a;
-            break;
         }
     }
 }
@@ -282,6 +289,7 @@ void gameplay(int n, char **map, bombs diff)
 
 int main(void)
 {
+    b:
     int n = main_menu() * 8 + 2;
     if (n - 2) {
         char **map = generate_map(n);
@@ -301,6 +309,7 @@ int main(void)
         refresh_screen();
         gameplay(n, map, number_of_bombs);
         free_mem((void **)map, n);
+        goto b;
     }
     return 0;
 }
